@@ -1,6 +1,7 @@
 name: windows port
 
 on:
+  workflow_dispatch:
   push:
   pull_request:
     paths:
@@ -139,6 +140,14 @@ jobs:
       if: failure() && steps.test.conclusion == 'failure'
       working-directory: tests
       run: python run-tests.py --print-failures
+    - name: pwd and ls
+      run: pwd && ls
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.6.2
+      with:
+        name: micropython-exec
+        path: ./build-standard/micropython.exe
+          
 
   cross-build-on-linux:
     runs-on: ubuntu-latest
