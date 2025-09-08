@@ -142,11 +142,13 @@ jobs:
       run: python run-tests.py --print-failures
     - name: pwd and ls
       run: pwd && ls
+    - name: tree
+      run: tree
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.2
       with:
         name: micropython-exec
-        path: ./ports/windows/build-standard/micropython.exe
+        path: /d/a/micropython/micropython/ports/windows/build-standard/micropython.exe
           
 
   cross-build-on-linux:
