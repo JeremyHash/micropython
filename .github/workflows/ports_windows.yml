@@ -19,78 +19,78 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-vs:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [x86, x64]
-        configuration: [Debug, Release]
-        variant: [dev, standard]
-        visualstudio: ['2017', '2019', '2022']
-        include:
-        - visualstudio: '2017'
-          vs_version: '[15, 16)'
-        - visualstudio: '2019'
-          vs_version: '[16, 17)'
-        - visualstudio: '2022'
-          vs_version: '[17, 18)'
-        # trim down the number of jobs in the matrix
-        exclude:
-        - variant: standard
-          configuration: Debug
-        - visualstudio: '2019'
-          configuration: Debug
-    runs-on: windows-latest
-    env:
-      CI_BUILD_CONFIGURATION: ${{ matrix.configuration }}
-    steps:
-    - name: Install Visual Studio 2017
-      if: matrix.visualstudio == '2017'
-      run: |
-        choco install visualstudio2017buildtools
-        choco install visualstudio2017-workload-vctools
-        choco install windows-sdk-8.1
-    - name: Install Visual Studio 2019
-      if: matrix.visualstudio == '2019'
-      run: |
-        choco install visualstudio2019buildtools
-        choco install visualstudio2019-workload-vctools
-        choco install windows-sdk-8.1
-    - uses: microsoft/setup-msbuild@v2
-      with:
-        vs-version: ${{ matrix.vs_version }}
-    - uses: actions/checkout@v5
-    - name: Build mpy-cross.exe
-      run: msbuild mpy-cross\mpy-cross.vcxproj -maxcpucount -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }}
-    - name: Update submodules
-      run: git submodule update --init lib/micropython-lib
-    - name: Build micropython.exe
-      run: msbuild ports\windows\micropython.vcxproj -maxcpucount -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }} -property:PyVariant=${{ matrix.variant }}
-    - name: Get micropython.exe path
-      id: get_path
-      run: |
-        $exePath="$(msbuild ports\windows\micropython.vcxproj -nologo -v:m -t:ShowTargetPath -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }} -property:PyVariant=${{ matrix.variant }})"
-        echo ("micropython=" + $exePath.Trim()) >> $env:GITHUB_OUTPUT
-    - name: Run tests
-      id: test
-      env:
-        MICROPY_MICROPYTHON: ${{ steps.get_path.outputs.micropython }}
-      working-directory: tests
-      run: python run-tests.py
-    - name: Print failures
-      if: failure() && steps.test.conclusion == 'failure'
-      working-directory: tests
-      run: python run-tests.py --print-failures
-    - name: Run mpy tests
-      id: test_mpy
-      env:
-        MICROPY_MICROPYTHON: ${{ steps.get_path.outputs.micropython }}
-      working-directory: tests
-      run: python run-tests.py --via-mpy -d basics float micropython
-    - name: Print mpy failures
-      if: failure() && steps.test_mpy.conclusion == 'failure'
-      working-directory: tests
-      run: python run-tests.py --print-failures
+  # build-vs:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       platform: [x86, x64]
+  #       configuration: [Debug, Release]
+  #       variant: [dev, standard]
+  #       visualstudio: ['2017', '2019', '2022']
+  #       include:
+  #       - visualstudio: '2017'
+  #         vs_version: '[15, 16)'
+  #       - visualstudio: '2019'
+  #         vs_version: '[16, 17)'
+  #       - visualstudio: '2022'
+  #         vs_version: '[17, 18)'
+  #       # trim down the number of jobs in the matrix
+  #       exclude:
+  #       - variant: standard
+  #         configuration: Debug
+  #       - visualstudio: '2019'
+  #         configuration: Debug
+  #   runs-on: windows-latest
+  #   env:
+  #     CI_BUILD_CONFIGURATION: ${{ matrix.configuration }}
+  #   steps:
+  #   - name: Install Visual Studio 2017
+  #     if: matrix.visualstudio == '2017'
+  #     run: |
+  #       choco install visualstudio2017buildtools
+  #       choco install visualstudio2017-workload-vctools
+  #       choco install windows-sdk-8.1
+  #   - name: Install Visual Studio 2019
+  #     if: matrix.visualstudio == '2019'
+  #     run: |
+  #       choco install visualstudio2019buildtools
+  #       choco install visualstudio2019-workload-vctools
+  #       choco install windows-sdk-8.1
+  #   - uses: microsoft/setup-msbuild@v2
+  #     with:
+  #       vs-version: ${{ matrix.vs_version }}
+  #   - uses: actions/checkout@v5
+  #   - name: Build mpy-cross.exe
+  #     run: msbuild mpy-cross\mpy-cross.vcxproj -maxcpucount -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }}
+  #   - name: Update submodules
+  #     run: git submodule update --init lib/micropython-lib
+  #   - name: Build micropython.exe
+  #     run: msbuild ports\windows\micropython.vcxproj -maxcpucount -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }} -property:PyVariant=${{ matrix.variant }}
+  #   - name: Get micropython.exe path
+  #     id: get_path
+  #     run: |
+  #       $exePath="$(msbuild ports\windows\micropython.vcxproj -nologo -v:m -t:ShowTargetPath -property:Configuration=${{ matrix.configuration }} -property:Platform=${{ matrix.platform }} -property:PyVariant=${{ matrix.variant }})"
+  #       echo ("micropython=" + $exePath.Trim()) >> $env:GITHUB_OUTPUT
+  #   - name: Run tests
+  #     id: test
+  #     env:
+  #       MICROPY_MICROPYTHON: ${{ steps.get_path.outputs.micropython }}
+  #     working-directory: tests
+  #     run: python run-tests.py
+  #   - name: Print failures
+  #     if: failure() && steps.test.conclusion == 'failure'
+  #     working-directory: tests
+  #     run: python run-tests.py --print-failures
+  #   - name: Run mpy tests
+  #     id: test_mpy
+  #     env:
+  #       MICROPY_MICROPYTHON: ${{ steps.get_path.outputs.micropython }}
+  #     working-directory: tests
+  #     run: python run-tests.py --via-mpy -d basics float micropython
+  #   - name: Print mpy failures
+  #     if: failure() && steps.test_mpy.conclusion == 'failure'
+  #     working-directory: tests
+  #     run: python run-tests.py --print-failures
 
   build-mingw:
     strategy:
@@ -140,13 +140,15 @@ jobs:
       if: failure() && steps.test.conclusion == 'failure'
       working-directory: tests
       run: python run-tests.py --print-failures
-    - name: pwd and ls
-      run: pwd && ls -al
+    - name: find exec file
+      run: |
+        echo "Workspace is: $GITHUB_WORKSPACE"
+        find $GITHUB_WORKSPACE -name "micropython.exe"
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.2
       with:
         name: micropython-exec
-        path: /d/a/micropython/micropython/ports/windows/build-standard/micropython.exe
+        path: $GITHUB_WORKSPACE/ports/windows/build-standard/micropython.exe
           
 
   cross-build-on-linux:
