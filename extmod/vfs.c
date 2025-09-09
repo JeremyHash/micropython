@@ -366,12 +366,15 @@ mp_obj_t mp_vfs_chdir(mp_obj_t path_in) {
 MP_DEFINE_CONST_FUN_OBJ_1(mp_vfs_chdir_obj, mp_vfs_chdir);
 
 mp_obj_t mp_vfs_getcwd(void) {
+    printf("mp_vfs_getcwd\n");
     if (MP_STATE_VM(vfs_cur) == MP_VFS_ROOT) {
+        printf("return 1\n");
         return MP_OBJ_NEW_QSTR(MP_QSTR__slash_);
     }
     mp_obj_t cwd_o = mp_vfs_proxy_call(MP_STATE_VM(vfs_cur), MP_QSTR_getcwd, 0, NULL);
     if (MP_STATE_VM(vfs_cur)->len == 1) {
         // don't prepend "/" for vfs mounted at root
+        printf("return 2\n");
         return cwd_o;
     }
     const char *cwd = mp_obj_str_get_str(cwd_o);
@@ -381,6 +384,7 @@ mp_obj_t mp_vfs_getcwd(void) {
     if (!(cwd[0] == '/' && cwd[1] == 0)) {
         vstr_add_str(&vstr, cwd);
     }
+    printf("return 3\n");
     return mp_obj_new_str_from_vstr(&vstr);
 }
 MP_DEFINE_CONST_FUN_OBJ_0(mp_vfs_getcwd_obj, mp_vfs_getcwd);
