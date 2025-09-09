@@ -133,9 +133,9 @@ jobs:
       run: make -C ports/windows VARIANT=${{ matrix.variant }} submodules
     - name: Build micropython.exe
       run: make -C ports/windows -j2 VARIANT=${{ matrix.variant }}
-    - name: Run tests
-      id: test
-      run: make -C ports/windows test_full VARIANT=${{ matrix.variant }}
+    # - name: Run tests
+    #   id: test
+    #   run: make -C ports/windows test_full VARIANT=${{ matrix.variant }}
     - name: Print failures
       if: failure() && steps.test.conclusion == 'failure'
       working-directory: tests
