@@ -148,7 +148,7 @@ jobs:
       uses: actions/upload-artifact@v4.6.2
       with:
         name: micropython-exec
-        path: $GITHUB_WORKSPACE/ports/windows/build-standard/micropython.exe
+        path: D:\a\micropython\micropython/ports/windows/build-standard/micropython.exe
           
 
   cross-build-on-linux:
