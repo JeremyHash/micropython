@@ -141,9 +141,7 @@ jobs:
       working-directory: tests
       run: python run-tests.py --print-failures
     - name: pwd and ls
-      run: pwd && ls
-    - name: tree
-      run: tree
+      run: pwd && ls -al
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.2
       with:
